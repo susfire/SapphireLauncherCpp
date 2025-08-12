@@ -1,0 +1,10 @@
+# Reference: https://build-cpp.github.io/cmkr/cmake-toml
+[project]
+name = "sapphire"
+
+[target.sapphire]
+type = "executable"
+sources = ["src/main.cpp"]
+windows.link-libraries = ["src/icon.res", "ws2_32"]
+headers = ["src/httplib.h", "src/Utf8Ini.h", "src/json.hpp"]
+compile-features = ["cxx_std_17"]
