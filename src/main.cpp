@@ -1,4 +1,5 @@
 #include "Utf8Ini.h"
+#include "args.hpp"
 #include "httplib.h"
 #include "json.hpp"
 #include <filesystem>
@@ -19,10 +20,23 @@ static std::string readFile( const char* path )
   return content;
 }
 
+struct Arguments : public ArgumentParser {
+  bool create = false;
+  bool nostart = false;
+
+  Arguments( int argc, char** argv )
+      : ArgumentParser( "Sapphire Launcher" )
+  {
+    addBool( "-create", create, "Create a new user." );
+    addBool( "-nostart", nostart, "Don't start the game (Windows only)" );
+    parseOrExit( argc, argv );
+  }
+};
+
 int main( int argc, char** argv )
 try
 {
-  auto create = argc > 1 && std::string( argv[ 1 ] ) == "create";
+  Arguments args( argc, argv );
   if( !fs::exists( "sapphire.ini" ) )
   {
     std::ofstream file( "sapphire.ini" );
@@ -70,7 +84,7 @@ try
           { "username", username },
           { "pass", password },
   };
-  auto path = create ? "/sapphire-api/lobby/createUser" : "/sapphire-api/lobby/login";
+  auto path = args.create ? "/sapphire-api/lobby/createUser" : "/sapphire-api/lobby/login";
 
   httplib::Client client( api );
   std::cout << "POST " << api << path << std::endl;
@@ -81,7 +95,7 @@ try
   }
   if( res->status != 200 )
   {
-    if( create )
+    if( args.create )
     {
       throw std::runtime_error( "Error creating user (already exists?)" );
     }
@@ -108,6 +122,11 @@ try
   commandLine += "DEV.MaxEntitledExpansionID=1 ";
   commandLine += "DEV.GMServerHost=" + frontierHost;
   std::cout << commandLine << std::endl;
+  if( args.nostart || !ini.GetValue( "sapphire", "nostart" ).empty() )
+  {
+    return EXIT_SUCCESS;
+  }
+
 #ifdef _WIN32
   if( !fs::exists( executable ) )
   {

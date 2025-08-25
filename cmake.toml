@@ -6,5 +6,5 @@ name = "sapphire"
 type = "executable"
 sources = ["src/main.cpp"]
 windows.link-libraries = ["src/icon.res", "ws2_32"]
-headers = ["src/httplib.h", "src/Utf8Ini.h", "src/json.hpp"]
+headers = ["src/httplib.h", "src/Utf8Ini.h", "src/json.hpp", "src/args.hpp"]
 compile-features = ["cxx_std_17"]

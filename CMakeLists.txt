@@ -30,6 +30,7 @@ project(sapphire)
 set(sapphire_SOURCES
 	cmake.toml
 	"src/Utf8Ini.h"
+	"src/args.hpp"
 	"src/httplib.h"
 	"src/json.hpp"
 	"src/main.cpp"

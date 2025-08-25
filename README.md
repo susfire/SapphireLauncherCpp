@@ -7,7 +7,7 @@ Super simple command line launcher for [Sapphire](https://github.com/SapphireSer
 - Place `sapphire.exe` next to `ffxiv_dx11.exe` (`game` folder).
 - Run `sapphire.exe` to create a template `sapphire.ini`.
 - Adjust the `username` and `password` to match your setup.
-- If your user does not yet exist, run `sapphire.exe create` to create it. Otherwise run `sapphire.exe` to start the game.
+- If your user does not yet exist, run `sapphire.exe -create` to create it. Otherwise run `sapphire.exe` to start the game.
 
 # Building
 
@@ -17,3 +17,17 @@ cmake --build build
 ```
 
 You can use [zig-cross](https://github.com/mrexodia/zig-cross) with `--toolchain ~/zig-cross/x86_64-windows-gnu.cmake` when configuring CMake to cross-compile for Windows on MacOS.
+
+# Configuration
+
+The `sapphire.ini` file has the follow fields:
+
+```toml
+[sapphire]
+api = http://127.0.0.1:80
+username = <username>
+password = <password>
+executable = ffxiv_dx11.exe
+```
+
+To debug the game you can use `sapphire.exe -nostart`, which will print you the command line to start the game with.
