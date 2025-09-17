@@ -28,6 +28,10 @@ api = http://127.0.0.1:80
 username = <username>
 password = <password>
 executable = ffxiv_dx11.exe
+debugger =
 ```
 
-To debug the game you can use `sapphire.exe -nostart`, which will print you the command line to start the game with.
+## Debugging
+
+- If you run `sapphire.exe -nostart` the launcher will print the command line without starting the game.
+- You can set `debugger = C:\x64dbg\release\x96dbg.exe` and hold down _Ctrl_ or run `sapphire.exe -debug` to start the game under a debugger.

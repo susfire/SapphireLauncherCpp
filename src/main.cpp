@@ -23,12 +23,14 @@ static std::string readFile( const char* path )
 struct Arguments : public ArgumentParser {
   bool create = false;
   bool nostart = false;
+  bool debug = false;
 
   Arguments( int argc, char** argv )
       : ArgumentParser( "Sapphire Launcher" )
   {
     addBool( "-create", create, "Create a new user." );
     addBool( "-nostart", nostart, "Don't start the game (Windows only)" );
+    addBool( "-debug", debug, "Start under debugger" );
     parseOrExit( argc, argv );
   }
 };
@@ -40,11 +42,13 @@ try
   if( !fs::exists( "sapphire.ini" ) )
   {
     std::ofstream file( "sapphire.ini" );
-    file << "[sapphire]" << std::endl;
-    file << "api = http://127.0.0.1:80" << std::endl;
-    file << "username = user" << std::endl;
-    file << "password = pass" << std::endl;
-    file << "executable = ffxiv_dx11.exe" << std::endl;
+    file << R"([sapphire]
+api = http://127.0.0.1:80
+username = user
+password = pass
+executable = ffxiv_dx11.exe
+debugger =
+)";
     std::cout << "Example sapphire.ini created" << std::endl;
     return EXIT_FAILURE;
   }
@@ -110,8 +114,20 @@ try
   auto lobbyPort = response.at( "lobbyPort" ).get< int >();
   auto sId = response.at( "sId" ).get< std::string >();
 
-  auto commandLine = executable;
-  commandLine += " DEV.TestSID=" + sId + " DEV.UseSqPack=1 DEV.DataPathType=1 ";
+
+  std::string commandLine;
+  auto debugger = ini.GetValue( "sapphire", "debugger" );
+  if( !debugger.empty() )
+  {
+    // Sleep a little bit to allow the user to hold down the control key
+    Sleep( 500 );
+  }
+  if( args.debug || !ini.GetValue( "sapphire", "debug" ).empty() || GetAsyncKeyState( VK_CONTROL ) & 0x8000 )
+  {
+    commandLine = debugger + " ";
+  }
+  commandLine += executable + " ";
+  commandLine += "DEV.TestSID=" + sId + " DEV.UseSqPack=1 DEV.DataPathType=1 ";
   for( int i = 0; i < 8; i++ )
   {
     auto index = std::to_string( i + 1 );
