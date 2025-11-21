@@ -29,6 +29,15 @@ username = <username>
 password = <password>
 executable = ffxiv_dx11.exe
 debugger =
+languageIndex = 1
+```
+
+## Languages
+```js
+日本語 = 0
+English = 1
+Deutsch = 2
+Français = 3
 ```
 
 ## Debugging

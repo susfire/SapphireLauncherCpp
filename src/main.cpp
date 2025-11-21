@@ -48,6 +48,7 @@ username = user
 password = pass
 executable = ffxiv_dx11.exe
 debugger =
+languageIndex = 1
 )";
     std::cout << "Example sapphire.ini created" << std::endl;
     return EXIT_FAILURE;
@@ -82,6 +83,11 @@ debugger =
   if( executable.empty() )
   {
     throw std::runtime_error( "Bad sapphire.ini: executable is empty" );
+  }
+  auto languageIndex = ini.GetValue( "sapphire", "languageIndex" );
+  if( languageIndex.empty() )
+  {
+    throw std::runtime_error( "Bad sapphire.ini: languageIndex is empty" );
   }
 
   nlohmann::json request = {
@@ -134,7 +140,9 @@ debugger =
     commandLine += "DEV.LobbyHost0" + index + "=" + lobbyHost + " ";
     commandLine += "DEV.LobbyPort0" + index + "=" + std::to_string( lobbyPort ) + " ";
   }
-  commandLine += "SYS.Region=3 language=1 version=1.0.0.0 ";
+  commandLine += "SYS.Region=3";
+  commandLine += "language=" + languageIndex;
+  commandLine += "version=1.0.0.0 ";
   commandLine += "DEV.MaxEntitledExpansionID=1 ";
   commandLine += "DEV.GMServerHost=" + frontierHost;
   std::cout << commandLine << std::endl;
