@@ -88,7 +88,7 @@ debugger =
           { "username", username },
           { "pass", password },
   };
-  auto path = args.create ? "/sapphire-api/lobby/createUser" : "/sapphire-api/lobby/login";
+  auto path = args.create ? "/sapphire-api/lobby/createAccount" : "/sapphire-api/lobby/login";
 
   httplib::Client client( api );
   std::cout << "POST " << api << path << std::endl;
