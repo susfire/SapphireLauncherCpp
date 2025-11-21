@@ -5,6 +5,18 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <chrono>
+#include <thread>
+
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 
 namespace fs = std::filesystem;
 
@@ -120,9 +132,15 @@ debugger =
   if( !debugger.empty() )
   {
     // Sleep a little bit to allow the user to hold down the control key
-    Sleep( 500 );
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
-  if( args.debug || !ini.GetValue( "sapphire", "debug" ).empty() || GetAsyncKeyState( VK_CONTROL ) & 0x8000 )
+  bool ctrl_down = false;
+  #ifdef _WIN32
+    ctrl_down = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+  #endif
+  if( args.debug
+      || !ini.GetValue( "sapphire", "debug" ).empty()
+      || ctrl_down )
   {
     commandLine = debugger + " ";
   }
