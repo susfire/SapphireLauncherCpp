@@ -121,7 +121,7 @@ languageIndex = 1
   auto sId = response.at( "sId" ).get< std::string >();
 
 
-  std::string commandLine;
+  std::vector< std::string > commandArgs;
   auto debugger = ini.GetValue( "sapphire", "debugger" );
   if( !debugger.empty() )
   {
@@ -130,22 +130,41 @@ languageIndex = 1
   }
   if( args.debug || !ini.GetValue( "sapphire", "debug" ).empty() || GetAsyncKeyState( VK_CONTROL ) & 0x8000 )
   {
-    commandLine = debugger + " ";
+    commandArgs.emplace_back( debugger );
   }
-  commandLine += executable + " ";
-  commandLine += "DEV.TestSID=" + sId + " DEV.UseSqPack=1 DEV.DataPathType=1 ";
+  commandArgs.emplace_back( executable );
+  commandArgs.emplace_back( "DEV.TestSID=" + sId );
+  commandArgs.emplace_back( "DEV.UseSqPack=1" );
+  commandArgs.emplace_back( "DEV.DataPathType=1" );
   for( int i = 0; i < 8; i++ )
   {
     auto index = std::to_string( i + 1 );
-    commandLine += "DEV.LobbyHost0" + index + "=" + lobbyHost + " ";
-    commandLine += "DEV.LobbyPort0" + index + "=" + std::to_string( lobbyPort ) + " ";
+    commandArgs.emplace_back( "DEV.LobbyHost0" + index + "=" + lobbyHost );
+    commandArgs.emplace_back( "DEV.LobbyPort0" + index + "=" + std::to_string( lobbyPort ) );
   }
-  commandLine += "SYS.Region=3";
-  commandLine += "language=" + languageIndex;
-  commandLine += "version=1.0.0.0 ";
-  commandLine += "DEV.MaxEntitledExpansionID=1 ";
-  commandLine += "DEV.GMServerHost=" + frontierHost;
-  std::cout << commandLine << std::endl;
+  commandArgs.emplace_back( "SYS.Region=3" );
+  commandArgs.emplace_back( "language=" + languageIndex );
+  commandArgs.emplace_back( "version=1.0.0.0" );
+  commandArgs.emplace_back( "DEV.MaxEntitledExpansionID=1" );
+  commandArgs.emplace_back( "DEV.GMServerHost=" + frontierHost );
+
+  std::string command;
+  for( size_t i = 0; i < commandArgs.size(); i++ )
+  {
+    if( i > 0 )
+    {
+      command += " ";
+    }
+    if( commandArgs[ i ].find( ' ' ) != std::string::npos )
+    {
+      command += "\"" + commandArgs[ i ] + "\"";
+    }
+    else
+    {
+      command += commandArgs[ i ];
+    }
+  }
+  std::cout << command << std::endl;
   if( args.nostart || !ini.GetValue( "sapphire", "nostart" ).empty() )
   {
     return EXIT_SUCCESS;
@@ -156,7 +175,7 @@ languageIndex = 1
   {
     throw std::runtime_error( "Bad sapphire.ini: executable '" + executable + "' does not exist" );
   }
-  return system( commandLine.c_str() );
+  return system( command.c_str() );
 #else
   return EXIT_SUCCESS;
 #endif// _WIN32
