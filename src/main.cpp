@@ -6,6 +6,10 @@
 #include <fstream>
 #include <string>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif// _WIN32
+
 namespace fs = std::filesystem;
 
 static std::string readFile( const char* path )
@@ -125,12 +129,17 @@ languageIndex = 1
   auto debugger = ini.GetValue( "sapphire", "debugger" );
   if( !debugger.empty() )
   {
+    bool ctrlDown = false;
+#ifdef _WIN32
     // Sleep a little bit to allow the user to hold down the control key
     Sleep( 500 );
-  }
-  if( args.debug || !ini.GetValue( "sapphire", "debug" ).empty() || GetAsyncKeyState( VK_CONTROL ) & 0x8000 )
-  {
-    commandArgs.emplace_back( debugger );
+    ctrlDown = ( GetAsyncKeyState( VK_CONTROL ) & 0x8000 ) != 0;
+#endif// _WIN32
+
+    if( args.debug || !ini.GetValue( "sapphire", "debug" ).empty() || ctrlDown )
+    {
+      commandArgs.emplace_back( debugger );
+    }
   }
   commandArgs.emplace_back( executable );
   commandArgs.emplace_back( "DEV.TestSID=" + sId );
